@@ -28,7 +28,7 @@ const AppLayout = () => (WrappedComponent) => {
             md={3}
             height="100%"
             sx={{ display: { xs: "none", sm: "block" } }}
-            // width={"400px"}
+            width={"400px"}
           >
             <ChatList
               chats={sampleChats}
