@@ -39,12 +39,12 @@ export const admintabs = [
   },
   {
     name: "Users",
-    path: "/admin/user-management",
+    path: "/admin/users",
     icon: <ManageAccountsIcon />,
   },
   {
     name: "Chats",
-    path: "/admin/chats-management",
+    path: "/admin/chats",
     icon: <GroupsIcon />,
   },
   {
