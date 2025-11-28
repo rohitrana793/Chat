@@ -2,6 +2,7 @@ import { Suspense, useState, lazy } from "react";
 import {
   AppBar,
   Backdrop,
+  Badge,
   Box,
   IconButton,
   Toolbar,
@@ -18,6 +19,18 @@ import {
 } from "@mui/icons-material";
 import { orange } from "../../constants/color";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { server } from "../../constants/config";
+import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { userNotExists } from "../../redux/reducers/auth";
+import {
+  setIsMobile,
+  setIsNotification,
+  setIsSearch,
+  setIsNewGroup,
+} from "../../redux/reducers/misc";
+import { resetNotificationCount } from "../../redux/reducers/chat";
 
 const SearchDialog = lazy(() => import("../specific/Search"));
 const NotificationDialog = lazy(() => import("../specific/Notifications"));
@@ -25,34 +38,44 @@ const NewGroupDialog = lazy(() => import("../specific/NewGroup"));
 
 function Header() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const [isMobile, setIsMobile] = useState(false);
-  const [isSearch, setIsSearch] = useState(false);
-  const [isNewGroup, setIsNewGroup] = useState(false);
-  const [isNotification, setIsNotification] = useState(false);
+  const { isSearch, isNotification, isNewGroup } = useSelector(
+    (state) => state.misc
+  );
+  const { notificationCount } = useSelector((state) => state.chat);
 
   const handleMobile = () => {
-    setIsMobile((prev) => !prev);
+    dispatch(setIsMobile(true));
   };
 
   const OpenSearch = () => {
-    setIsSearch((prev) => !prev);
+    dispatch(setIsSearch(true));
   };
 
   const openNewGroup = () => {
-    setIsNewGroup((prev) => !prev);
+    dispatch(setIsNewGroup(true));
   };
 
   const openNotification = () => {
-    setIsNotification((prev) => !prev);
+    dispatch(setIsNotification(true));
+    dispatch(resetNotificationCount());
   };
 
   const navigateToGroup = () => {
     navigate("/groups");
   };
 
-  const logoutHandler = () => {
-    console.log("Logout");
+  const logoutHandler = async () => {
+    try {
+      const { data } = await axios.get(`${server}/api/v1/user/logout`, {
+        withCredentials: true,
+      });
+      dispatch(userNotExists());
+      toast.success(data.message);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something Went Wrong");
+    }
   };
 
   return (
@@ -101,6 +124,7 @@ function Header() {
                 title={"Notifications"}
                 icon={<NotificationsIcon />}
                 onClick={openNotification}
+                value={notificationCount}
               />
               <IconBtn
                 title={"Logout"}
@@ -130,11 +154,17 @@ function Header() {
   );
 }
 
-const IconBtn = ({ title, icon, onClick }) => {
+const IconBtn = ({ title, icon, onClick, value }) => {
   return (
     <Tooltip title={title}>
       <IconButton color="inherit" size="large" onClick={onClick}>
-        {icon}
+        {value ? (
+          <Badge badgeContent={value} color="error">
+            {icon}
+          </Badge>
+        ) : (
+          icon
+        )}
       </IconButton>
     </Tooltip>
   );

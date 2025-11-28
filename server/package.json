@@ -3,15 +3,18 @@
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
-  "scripts": {
+ "scripts": {
     "start": "SET NODE_ENV=PRODUCTION && node app.js",
-    "dev": "SET NODE_ENV=DEVELOPMENT && nodemon app.js"
+    "dev": "SET NODE_ENV=PRODUCTION && nodemon app.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@google/genai": "^1.30.0",
+    "@google/generative-ai": "^0.24.1",
+    "@tensorflow/tfjs-node": "^4.22.0",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.7.0",
     "cookie-parser": "^1.4.7",
@@ -22,6 +25,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.17.0",
     "multer": "^2.0.2",
+    "openai": "^6.9.0",
     "socket.io": "^4.8.1",
     "uuid": "^11.1.0"
   },

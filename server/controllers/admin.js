@@ -103,17 +103,51 @@ const allChats = TryCatch(async (req, res) => {
   });
 });
 
+// const allMessages = TryCatch(async (req, res) => {
+//   const messages = await Message.find({})
+//     .populate("sender", "name avatar")
+//     .populate("chat", "groupChat");
+
+//   const transformedMessages = messages.map(
+//     ({ content, attachments, _id, sender, createdAt, chat }) => ({
+//       _id,
+//       attachments,
+//       content,
+//       createdAt,
+//       chat: chat._id,
+//       groupChat: chat.groupChat,
+//       sender: {
+//         _id: sender._id,
+//         name: sender.name,
+//         avatar: sender.avatar?.url || "",
+//       },
+//     })
+//   );
+
+//   return res.status(200).json({
+//     success: true,
+//     messages: transformedMessages,
+//   });
+// });
 const allMessages = TryCatch(async (req, res) => {
   const messages = await Message.find({})
     .populate("sender", "name avatar")
     .populate("chat", "groupChat");
 
-  const transformedMessages = messages.map(
-    ({ content, attachments, _id, sender, createdAt, chat }) => ({
-      _id,
+  const transformedMessages = messages.map((msg) => {
+    const sender = msg.sender || {
+      _id: null,
+      name: "Unknown",
+      avatar: { url: "" },
+    };
+    const chat = msg.chat || { _id: null, groupChat: false };
+    const attachments = msg.attachments || [];
+
+    return {
+      _id: msg._id,
       attachments,
-      content,
-      createdAt,
+      content: msg.content,
+      createdAt: msg.createdAt,
       chat: chat._id,
       groupChat: chat.groupChat,
       sender: {
@@ -121,8 +155,8 @@ const allMessages = TryCatch(async (req, res) => {
         name: sender.name,
         avatar: sender.avatar?.url || "",
       },
-    })
-  );
+    };
+  });
 
   return res.status(200).json({
     success: true,

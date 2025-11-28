@@ -10,8 +10,6 @@ import {
   LineElement,
   ArcElement,
   Legend,
-  plugins,
-  scales,
 } from "chart.js";
 
 import {
@@ -66,7 +64,7 @@ const LineChart = ({ value = [] }) => {
     datasets: [
       {
         data: value,
-        label: "Revenue",
+        label: "Messages",
         fill: true,
         backgroundColor: purpleLight,
         borderColor: purple,

@@ -8,6 +8,10 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    bio: {
+      type: String,
+      required: true,
+    },
     username: {
       type: String,
       required: true,
@@ -28,10 +32,6 @@ const userSchema = new Schema(
         required: true,
       },
     },
-    // bio: {
-    //   type: String,
-    //   default: "",
-    // },
   },
   {
     timestamps: true,
@@ -42,6 +42,7 @@ const userSchema = new Schema(
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await hash(this.password, 10);
+  next();
 });
 
 export const User = models.User || model("User", userSchema);

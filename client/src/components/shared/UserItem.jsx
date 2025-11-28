@@ -2,6 +2,7 @@ import { Avatar, IconButton, ListItem, Stack, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { memo } from "react";
+import { transformImage } from "../../lib/features";
 
 const UserItem = ({
   user,
@@ -20,7 +21,7 @@ const UserItem = ({
         width={"100%"}
         {...styling}
       >
-        <Avatar />
+        <Avatar src={transformImage(avatar)} />
         <Typography
           variant="body1"
           sx={{

@@ -13,8 +13,14 @@ import { CameraAlt as CameraAltIcon } from "@mui/icons-material";
 import { VisuallyHiddenInput } from "../components/styles/StyledComponent";
 import { useFileHandler, useInputValidation, useStrongPassword } from "6pp";
 import { usernameValidator } from "../utils/validators";
+import axios from "axios";
+import { server } from "../constants/config";
+import { useDispatch } from "react-redux";
+import { userExists } from "../redux/reducers/auth";
+import toast from "react-hot-toast";
 function Login() {
   const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleLogin = () => setIsLogin((prev) => !prev);
 
@@ -25,12 +31,79 @@ function Login() {
   // const password = useStrongPassword();
   const avatar = useFileHandler("single");
 
-  const handleLogin = (e) => {
+  const dispatch = useDispatch();
+
+  const handleLogin = async (e) => {
     e.preventDefault();
+
+    const toastId = toast.loading("Logging In...");
+
+    setIsLoading(true);
+    const config = {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    try {
+      const { data } = await axios.post(
+        `${server}/api/v1/user/login`,
+        {
+          username: username.value,
+          password: password.value,
+        },
+        config
+      );
+      dispatch(userExists(data.user));
+      toast.success(data.message, {
+        id: toastId,
+      });
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something Went Wrong", {
+        id: toastId,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
+
+    const toastId = toast.loading("Signing Up...");
+    setIsLoading(true);
+
+    const formData = new FormData();
+    formData.append("avatar", avatar.file);
+    formData.append("name", name.value);
+    formData.append("bio", bio.value);
+    formData.append("username", username.value);
+    formData.append("password", password.value);
+
+    const config = {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    };
+
+    try {
+      const { data } = await axios.post(
+        `${server}/api/v1/user/new`,
+        formData,
+        config
+      );
+      dispatch(userExists(data.user));
+      toast.success(data.message, {
+        id: toastId,
+      });
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something Went Wrong", {
+        id: toastId,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -93,13 +166,19 @@ function Login() {
                   type="submit"
                   fullWidth
                   sx={{ mt: 1 }}
+                  disabled={isLoading}
                 >
                   Login
                 </Button>
                 <Typography textAlign={"center"} m={"1rem"}>
                   OR
                 </Typography>
-                <Button variant="text" fullWidth onClick={toggleLogin}>
+                <Button
+                  disabled={isLoading}
+                  variant="text"
+                  fullWidth
+                  onClick={toggleLogin}
+                >
                   Sign Up Instead
                 </Button>
               </form>
@@ -171,6 +250,15 @@ function Login() {
                 <TextField
                   required
                   fullWidth
+                  label="Bio"
+                  margin="dense"
+                  variant="outlined"
+                  value={bio.value}
+                  onChange={bio.changeHandler}
+                />
+                <TextField
+                  required
+                  fullWidth
                   label="Username"
                   margin="dense"
                   variant="outlined"
@@ -197,28 +285,26 @@ function Login() {
                     {password.error}
                   </Typography>
                 )}
-                <TextField
-                  required
-                  fullWidth
-                  label="Bio"
-                  margin="dense"
-                  variant="outlined"
-                  value={bio.value}
-                  onChange={bio.changeHandler}
-                />
+
                 <Button
                   variant="contained"
                   color="primary"
                   type="submit"
                   fullWidth
                   sx={{ mt: 1 }}
+                  disabled={isLoading}
                 >
                   Sign Up
                 </Button>
                 <Typography textAlign={"center"} m={"1rem"}>
                   OR
                 </Typography>
-                <Button variant="text" fullWidth onClick={toggleLogin}>
+                <Button
+                  dispatch={isLoading}
+                  variant="text"
+                  fullWidth
+                  onClick={toggleLogin}
+                >
                   Login Instead
                 </Button>
               </form>
