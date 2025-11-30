@@ -15,8 +15,6 @@ import {
 } from "./seeders/chat.js";
 import { createUser } from "./seeders/user.js";
 import OpenAI from "openai";
-import moderationRoute from "./routes/moderation.js";
-import smartReplyRoute from "./routes/smartReplay.js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GoogleGenAI } from "@google/genai";
 import geminiRoute from "./routes/gemini.js";
@@ -34,7 +32,6 @@ import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/message.js";
 import { corsOptions } from "./constants/config.js";
 import { socketAuthenticator } from "./middlewares/auth.js";
-
 import userRoute from "./routes/user.js";
 import chatRoute from "./routes/chat.js";
 import adminRoute from "./routes/admin.js";
@@ -105,8 +102,6 @@ app.use(cors(corsOptions));
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/chat", chatRoute);
 app.use("/api/v1/admin", adminRoute);
-app.use("/api/v1/mod/check", moderationRoute);
-app.use("/api/v1/smart-reply", smartReplyRoute);
 app.use("/api/v1/content", geminiRoute);
 
 app.get("/", (req, res) => {
